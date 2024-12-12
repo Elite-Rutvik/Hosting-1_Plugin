@@ -288,8 +288,12 @@ def process_video_file(video_path, index):
             os.remove(audio_path)
 
         """Convert video file to mp3 using ffmpeg"""
+
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        # Relative path to ffmpeg.exe
+        FFMPEG_PATH = os.path.join(BASE_DIR, "ffmpeg.exe")
         command = [
-            'ffmpeg.exe',
+            FFMPEG_PATH,
             '-i', video_path,
             '-q:a', '0',
             '-map', 'a',
