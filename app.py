@@ -23,11 +23,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 logging.getLogger("moviepy").setLevel(logging.ERROR)
 
-# Load environment variables from the .env file
-load_dotenv()
 
 # Configure the Gemini API with your API key
-api_key = os.getenv("GOOGLE_API_KEY")
+api_key = "AIzaSyDS98E34wUH1EtFmZTNoW1yVlh8twMNt9I"
 
 genai.configure(api_key=api_key)
 
@@ -135,7 +133,6 @@ def transcribe_mp3_file(mp3_file_path):
             transcription = result.text
             transcription = transcription.replace('```', '').replace('json', '')
             # print(f"Transcription:\n{transcription}")  # Debug: Print the transcription
-            print("Transcription generated for ", mp3_file_path)
             return transcription
 
         return "No transcription detected in the audio"
@@ -280,20 +277,18 @@ def process_video_file(video_path, index):
     try:
         # Extract audio
         url_folder = os.path.dirname(video_path)
-        audio_path = os.path.join(url_folder, f"audio_{index}.mp3")
-        # video_clip = VideoFileClip(video_path)
-        # video_clip.audio.write_audiofile(audio_path, verbose=False, logger=None)
+        # Get the video filename without extension
+        video_filename = os.path.splitext(os.path.basename(video_path))[0]
+        # Create audio path with same filename but .mp3 extension
+        audio_path = os.path.join(url_folder, f"{video_filename}.mp3")
 
         if os.path.exists(audio_path):
+            # Check if the audio file already exists and delete it if present
             os.remove(audio_path)
-
-        """Convert video file to mp3 using ffmpeg"""
-
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        # Relative path to ffmpeg.exe
-        FFMPEG_PATH = os.path.join(BASE_DIR, "ffmpeg.exe")
+        
+        # Convert video file to mp3 using ffmpeg
         command = [
-            FFMPEG_PATH,
+            'ffmpeg.exe',
             '-i', video_path,
             '-q:a', '0',
             '-map', 'a',
@@ -316,7 +311,7 @@ def process_url_list(urls):
     try:
         downloaded_files = {}
         results = {}
-        # timeout = 3000
+        # timeout = 300
 
         # Phase 1: Download all videos in parallel
         print("Phase 1: Downloading videos...")
